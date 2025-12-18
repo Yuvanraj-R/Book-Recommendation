@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>📚 BookMind Recommendations</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h2 class="h2-small white-text">Recommended Books</h2>
+
+<p id="loading-text" class="white-text" style="text-align: center; margin-top: 20px;">
+    ⏳ Finding the best books for you...
+</p>
+
+<div id="results-container"></div>
+
+<div style="text-align: center; margin-bottom: 40px;">
+    <a href="index.html">⬅ Go back and change preferences</a>
+</div>
+
+<script>
+    // 1. Get user preferences from URL
+    const params = new URLSearchParams(window.location.search);
+    const genre = params.get("genre");
+    const mood = params.get("mood");
+    const time = params.get("time");
+    const language = params.get("language");
+
+    const resultsDiv = document.getElementById("results-container");
+    const loadingText = document.getElementById("loading-text");
+
+    // 2. Spring Boot API link
+    const apiUrl = `http://localhost:8080/recommend?genre=${genre}&mood=${mood}&time=${time}&language=${language}`;
+
+    // 3. Fetch recommended books
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Server not responding");
+            }
+            return response.json();
+        })
+        .then(books => {
+            loadingText.style.display = 'none';
+
+            if (!books || books.length === 0) {
+                resultsDiv.innerHTML = `<p class="white-text" style="text-align:center;">No books found matching your criteria. Try adjusting your time or mood! 😕</p>`;
+                return;
+            }
+
+            // Loop through books and build cards
+            books.forEach(book => {
+                const card = document.createElement("div");
+                card.className = "card";
+
+                card.innerHTML = `
+                    <img src="${book.imageUrl}" class="book-img" alt="${book.title}"
+                        onerror="this.src='images/default.jpg'">
+                    <div>
+                        <h3>${book.title}</h3>
+                        <p><b>Author:</b> ${book.author}</p>
+                        <p><b>Genre:</b> ${book.genre} | <b>Language:</b> ${book.language}</p>
+                        <p><b>Reading Time:</b> ${book.estimatedMinutes} mins</p>
+                        <p><b>Rating:</b> ⭐ ${book.rating}</p>
+                        <p style="margin-top: 10px;">${book.description}</p>
+                    </div>
+                `;
+
+                resultsDiv.appendChild(card);
+            });
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            loadingText.style.color = "#ff6b6b";
+            loadingText.innerHTML = `
+                ⚠️ <b>Could not connect to the backend.</b><br>
+                <span style="font-size: 14px;">Make sure your Spring Boot app is running on port 8080.</span>
+            `;
+        });
+</script>
+
+</body>
+</html>

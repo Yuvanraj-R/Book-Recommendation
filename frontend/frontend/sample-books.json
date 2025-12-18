@@ -1,0 +1,12 @@
+[
+  {
+    "title": "Demo Book 1",
+    "author": "Demo Author",
+    "genre": "Fiction",
+    "language": "English",
+    "imagePath": "images/the_alchemist.jpg",
+    "estimatedMinutes": 200,
+    "rating": 4.5,
+    "description": "Sample description 1."
+  }
+]

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>📚 BookMind.</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Simple styles for the feedback section to match your theme */
+        #feedback-section {
+            display: none; /* Hidden by default */
+            margin-top: 60px;
+            padding: 40px 20px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            text-align: center;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .feedback-textarea {
+            width: 100%;
+            padding: 15px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #1a1d30;
+            color: #fff;
+            font-family: inherit;
+            resize: vertical;
+        }
+    </style>
+</head>
+
+<body>
+<div class="page-wrapper">
+    <header class="navbar">
+        <div class="logo">BookMind<span>.</span></div>
+        <nav class="nav-links">
+            <a href="explore.html">Explore</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+
+    <main class="layout">
+        <section class="hero">
+            <p class="tag">Smart · Personal · Time-Based</p>
+            <h1>Find the <span>right book</span><br>for your mood & time.</h1>
+            <p class="hero-sub">
+                Tell us your mood, time and language – we’ll recommend books that you can
+                actually finish, not just add to your wishlist.
+            </p>
+
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <span class="stat-number">+250</span>
+                    <span class="stat-label">Curated Titles</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">24x7</span>
+                    <span class="stat-label">Smart Suggestions</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-card">
+            <h2>Start your reading session</h2>
+            <p class="form-sub">Fill the preferences and we’ll do the thinking for you.</p>
+
+            <form id="book-form">
+                <label>Genre</label>
+                <div class="input-wrapper">
+                    <select id="genre" required>
+                        <option value="">Select genre</option>
+                        <option value="Self-Help">Self-Help</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Historical Fiction">Historical Fiction</option>
+                        <option value="Sci-Fi">Sci-Fi</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Biography">Biography</option>
+                        <option value="Mystery">Mystery</option>
+                        <option value="Fantasy">Fantasy</option>
+                    </select>
+                </div>
+
+                <label>Mood</label>
+                <div class="input-wrapper">
+                    <select id="mood" required>
+                        <option value="">Select mood</option>
+                        <option value="relaxed">Relaxed</option>
+                        <option value="motivated">Motivated</option>
+                        <option value="focused">Focused</option>
+                        <option value="adventurous">Adventurous</option>
+                        <option value="emotional">Emotional</option>
+                        <option value="serious">Serious</option>
+                    </select>
+                </div>
+
+                <label>Available time (minutes)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="time" placeholder="e.g. 30, 45, 60" required>
+                </div>
+
+                <label>Language</label>
+                <div class="input-wrapper">
+                    <select id="language" required>
+                        <option value="">Select language</option>
+                        <option value="English">English</option>
+                        <option value="Tamil">Tamil</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Malayalam">Malayalam</option>
+                        <option value="Telugu">Telugu</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="primary-btn">
+                    🔍 Recommend books
+                </button>
+
+                <p class="mini-note">No login needed · No ads · Just smart suggestions</p>
+            </form>
+        </section>
+    </main>
+
+    <section id="results-section" style="margin-top: 50px;">
+    </section>
+
+    <section id="feedback-section">
+        <h2 class="h2-small white-text">Rate these recommendations</h2>
+        <p style="color:#d5daff; margin-bottom: 20px;">Did we help you find a good read?</p>
+
+        <form id="feedback-form">
+            <div class="input-wrapper">
+                <select id="feedback-rating" required style="text-align: center;">
+                    <option value="">Select Rating</option>
+                    <option value="5">⭐⭐⭐⭐⭐ - Perfect Match</option>
+                    <option value="4">⭐⭐⭐⭐ - Good</option>
+                    <option value="3">⭐⭐⭐ - Okay</option>
+                    <option value="2">⭐⭐ - Not great</option>
+                    <option value="1">⭐ - Poor</option>
+                </select>
+            </div>
+
+            <textarea id="feedback-comment" class="feedback-textarea" rows="3" placeholder="Any comments or suggestions? (Optional)"></textarea>
+
+            <button type="submit" class="primary-btn" style="background-color: #4CAF50;">
+                Submit Feedback
+            </button>
+        </form>
+    </section>
+
+</div>
+
+<script>
+    document.getElementById('book-form').addEventListener('submit', function(e) {
+        // 1. STOP page reload
+        e.preventDefault();
+
+        // Hide feedback section if a new search starts
+        document.getElementById('feedback-section').style.display = 'none';
+
+        // 2. Get input values
+        const genre = document.getElementById('genre').value;
+        const mood = document.getElementById('mood').value;
+        const time = document.getElementById('time').value;
+        const language = document.getElementById('language').value;
+
+        // 3. Get results container
+        const resultsSection = document.getElementById('results-section');
+
+        // 4. Show "Searching..." state
+        resultsSection.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <h2 class="h2-small white-text">Searching...</h2>
+                <p style="color:#aeb4ff;">Finding the perfect match for you ⏳</p>
+            </div>
+        `;
+
+        // 5. Build Backend URL
+        const apiUrl = `http://localhost:8080/recommend?genre=${genre}&mood=${mood}&time=${time}&language=${language}`;
+
+        // 6. Fetch Data
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) throw new Error("Server Error");
+                return response.json();
+            })
+            .then(books => {
+                // Clear "Searching..." text
+                resultsSection.innerHTML = '<h2 class="h2-small white-text" style="text-align:center; margin-bottom:20px;">Recommended Books</h2>';
+
+                if (!books || books.length === 0) {
+                    resultsSection.innerHTML += `
+                        <p style="text-align: center; color: #f5f7ff;">
+                            No books found for these preferences. Try changing the mood or increasing the time! 😕
+                        </p>`;
+                    return;
+                }
+
+                // Loop through books
+                books.forEach(book => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+
+                    const smartFallback = `https://placehold.co/400x600/2a2d45/ffba5a?text=${book.title.replace(/ /g, '+')}`;
+
+                    card.innerHTML = `
+                        <img src="${book.imagePath}"
+                             class="book-img"
+                             alt="${book.title}"
+                             onerror="this.onerror=null; this.src='${smartFallback}'">
+                        <div>
+                            <h3>${book.title}</h3>
+                            <p><b>Author:</b> ${book.author}</p>
+                            <p><b>Genre:</b> ${book.genre} | <b>Language:</b> ${book.language}</p>
+                            <p><b>Reading Time:</b> ${book.estimatedMinutes} mins</p>
+                            <p><b>Rating:</b> ⭐ ${book.rating}</p>
+                            <p style="margin-top: 8px; color:#d5daff;">${book.description}</p>
+                        </div>
+                    `;
+                    resultsSection.appendChild(card);
+                });
+
+                // 7. SHOW THE FEEDBACK SECTION
+                document.getElementById('feedback-section').style.display = 'block';
+
+                // Smooth scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                resultsSection.innerHTML = `
+                    <div style="text-align: center; color: #ff6b6b; padding: 40px;">
+                        <h3>⚠️ Connection Error</h3>
+                        <p>Could not connect to the backend. Is the Java app running?</p>
+                    </div>
+                `;
+            });
+    });
+
+    // --- NEW: Handle Feedback Submission ---
+    document.getElementById('feedback-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const rating = document.getElementById('feedback-rating').value;
+        const comment = document.getElementById('feedback-comment').value;
+
+        // Since we don't have a backend endpoint for feedback yet, we just show an alert
+        console.log(`Feedback submitted: Rating ${rating}, Comment: ${comment}`);
+
+        alert("Thank you for your feedback! We're glad we could help.");
+
+        // Clear the form and hide it
+        document.getElementById('feedback-form').reset();
+        document.getElementById('feedback-section').style.display = 'none';
+    });
+</script>
+
+</body>
+</html>
